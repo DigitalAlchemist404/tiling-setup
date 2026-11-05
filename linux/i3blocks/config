@@ -1,0 +1,29 @@
+# i3blocks: pomodoro, cronómetro y datos del sistema.
+# Clic en el pomodoro o el cronómetro: izquierdo inicia/pausa, derecho reinicia,
+# central (solo pomodoro) cambia de tiempos.
+separator=true
+separator_block_width=15
+
+[pomodoro]
+command=$HOME/.local/share/tiling-setup/timer-core.sh show pomo
+interval=1
+
+[cronometro]
+command=$HOME/.local/share/tiling-setup/timer-core.sh show sw
+interval=1
+
+[carga]
+command=cut -d' ' -f1 /proc/loadavg
+interval=5
+
+[memoria]
+command=free -h | awk '/^Mem:/ {print $3 " / " $7}'
+interval=5
+
+[disco]
+command=df -h --output=avail / | tail -1 | tr -d ' '
+interval=30
+
+[fecha]
+command=date '+%Y-%m-%d %H:%M'
+interval=1

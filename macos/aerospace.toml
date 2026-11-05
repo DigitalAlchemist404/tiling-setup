@@ -1,0 +1,216 @@
+# ~/.aerospace.toml
+# Configuración de AeroSpace, un gestor de ventanas tipo i3 para macOS.
+#
+# Modificador principal: Command + Option (cmd-alt).
+#   - No choca con cmd-1..9 (pestañas de los navegadores).
+#   - No choca con cmd-shift-3/4/5 (capturas de pantalla).
+#   - No escribe caracteres especiales (Option solo cambia lo que se teclea).
+#
+# Recargar la configuración: cmd-alt-shift-r y luego Esc, o `aerospace reload-config`.
+# Validar sin aplicar: `aerospace reload-config --dry-run`.
+# Las reglas de ventanas solo afectan ventanas nuevas: reabre la app tras cambiarlas.
+
+config-version = 2
+start-at-login = true
+
+# Escritorios que siguen existiendo aunque estén vacíos
+persistent-workspaces = ['1', '2', '3', '4']
+
+# Avisar a SketchyBar (la barra superior) cuando cambias de escritorio o de ventana
+exec-on-workspace-change = ['/bin/bash', '-c', '/opt/homebrew/bin/sketchybar --trigger aerospace_workspace_change']
+on-focus-changed = ['exec-and-forget /opt/homebrew/bin/sketchybar --trigger aerospace_focus_change']
+
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+accordion-padding = 30
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+
+# Si pulsas cmd-h por error y la app se oculta, ponlo en true para que se muestre sola.
+automatically-unhide-macos-hidden-apps = false
+
+# Opcional, bordes de color en la ventana enfocada (JankyBorders):
+#   brew tap FelixKratz/formulae && brew install borders
+# y luego descomenta este bloque.
+# after-startup-command = [
+#   'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0'
+# ]
+
+[gaps]
+inner.horizontal = 10
+inner.vertical = 10
+outer.left = 10
+outer.right = 10
+outer.top = 42
+outer.bottom = 10
+
+[mode.main.binding]
+
+# --- Escritorios (workspaces), como Mod+1..4 de i3 ---
+cmd-alt-1 = 'workspace 1'
+cmd-alt-2 = 'workspace 2'
+cmd-alt-3 = 'workspace 3'
+cmd-alt-4 = 'workspace 4'
+# Para más escritorios, copia las líneas con 5, 6... en ambos bloques.
+
+# También con Command + Shift + número (tu captura de pantalla usa otra combinación)
+cmd-shift-1 = 'workspace 1'
+cmd-shift-2 = 'workspace 2'
+cmd-shift-3 = 'workspace 3'
+cmd-shift-4 = 'workspace 4'
+
+# Mandar la ventana enfocada a otro escritorio, como Mod+Shift+1..4 de i3
+cmd-alt-shift-1 = 'move-node-to-workspace 1'
+cmd-alt-shift-2 = 'move-node-to-workspace 2'
+cmd-alt-shift-3 = 'move-node-to-workspace 3'
+cmd-alt-shift-4 = 'move-node-to-workspace 4'
+
+# Escritorio anterior (flecha arriba) o siguiente (flecha abajo), y volver al último
+cmd-alt-up = 'workspace --wrap-around prev'
+cmd-alt-down = 'workspace --wrap-around next'
+cmd-alt-b = 'workspace-back-and-forth'
+
+# --- Abrir una terminal nueva (Option + Enter) ---
+alt-enter = 'exec-and-forget open -na Alacritty'
+
+# --- Moverse entre ventanas/pestañas con las flechas, como en i3 ---
+# En modo pestañas (cmd-alt-w), izquierda/derecha cambian de pestaña y dan la vuelta.
+cmd-alt-left = 'focus --boundaries-action wrap-around-the-workspace left'
+cmd-alt-right = 'focus --boundaries-action wrap-around-the-workspace right'
+
+# --- Enfocar y mover ventanas (h j k l como en vim e i3) ---
+cmd-alt-h = 'focus left'
+cmd-alt-j = 'focus down'
+cmd-alt-k = 'focus up'
+cmd-alt-l = 'focus right'
+
+cmd-alt-shift-h = 'move left'
+cmd-alt-shift-j = 'move down'
+cmd-alt-shift-k = 'move up'
+cmd-alt-shift-l = 'move right'
+
+# --- Cambiar la forma de ver los escritorios ---
+# Mosaico (como Super+E de i3; vuelve a pulsar para alternar horizontal/vertical)
+cmd-alt-e = 'layout tiles horizontal vertical'
+# Pestañas (como Super+W de i3): ventanas apiladas, una visible a la vez
+cmd-alt-w = 'layout accordion horizontal'
+# Pantalla completa de la ventana enfocada
+cmd-alt-enter = 'fullscreen'
+# Sacar la ventana del mosaico (flotante) o volver a meterla
+cmd-alt-shift-space = 'layout floating tiling'
+
+# --- Pomodoro y cronómetro de la barra ---
+# p: inicia/pausa  shift-p: reinicia  m: cambia de tiempos  shift-m: tiempos propios  shift-e: +10 min
+cmd-alt-p = 'exec-and-forget $HOME/.config/sketchybar/plugins/timer.sh pomo toggle'
+cmd-alt-shift-p = 'exec-and-forget $HOME/.config/sketchybar/plugins/timer.sh pomo reset'
+cmd-alt-m = 'exec-and-forget $HOME/.config/sketchybar/plugins/timer.sh pomo cycle'
+cmd-alt-shift-m = 'exec-and-forget $HOME/.config/sketchybar/plugins/timer.sh pomo custom'
+cmd-alt-shift-e = 'exec-and-forget $HOME/.config/sketchybar/plugins/timer.sh pomo extend'
+cmd-alt-s = 'exec-and-forget $HOME/.config/sketchybar/plugins/timer.sh sw toggle'
+cmd-alt-shift-s = 'exec-and-forget $HOME/.config/sketchybar/plugins/timer.sh sw reset'
+
+# --- Tamaños ---
+cmd-alt-u = 'resize smart -50'
+cmd-alt-i = 'resize smart +50'
+cmd-alt-0 = 'balance-sizes'
+
+# --- Varios monitores ---
+cmd-alt-o = 'focus-monitor --wrap-around next'
+
+# --- Modo servicio (recargar, reiniciar el layout) ---
+cmd-alt-shift-r = 'mode service'
+
+[mode.service.binding]
+esc = ['reload-config', 'mode main']
+r = ['flatten-workspace-tree', 'mode main']
+f = ['layout floating tiling', 'mode main']
+backspace = ['close-all-windows-but-current', 'mode main']
+
+# ============================================================================
+# REGLAS POR APLICACIÓN
+# AeroSpace revisa las reglas en orden y se detiene en la primera que coincide.
+# Para ver el id de cada app: aerospace list-apps
+# ============================================================================
+
+# --- Apps que no quiero en mosaico (se abren flotantes) ---
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.calculator'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.ActivityMonitor'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.archiveutility'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.DiskUtility'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.1password.1password'
+run = 'layout floating'
+
+# --- Cada tipo de app va a su propio escritorio ---
+# Una sola ventana en un escritorio ocupa toda la pantalla.
+# Escritorio 1: terminales
+[[on-window-detected]]
+if.app-id = 'org.alacritty'
+run = 'move-node-to-workspace 1'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.Terminal'
+run = 'move-node-to-workspace 1'
+
+# Escritorio 2: navegadores
+[[on-window-detected]]
+if.app-id = 'com.brave.Browser'
+run = 'move-node-to-workspace 2'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.Safari'
+run = 'move-node-to-workspace 2'
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.edgemac'
+run = 'move-node-to-workspace 2'
+
+# Escritorio 3: notas
+[[on-window-detected]]
+if.app-id = 'net.shinyfrog.bear'
+run = 'move-node-to-workspace 3'
+
+# Escritorio 4: música y video
+[[on-window-detected]]
+if.app-id = 'com.apple.Music'
+run = 'move-node-to-workspace 4'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.QuickTimePlayerX'
+run = 'move-node-to-workspace 4'
+
+# Antigravity: busca su id con `aerospace list-apps` y descomenta
+# [[on-window-detected]]
+# if.app-id = 'ID_DE_ANTIGRAVITY'
+# run = 'move-node-to-workspace 3'
+
+# --- MODO INVERSO: todo flotante y solo las apps elegidas en mosaico ---
+# Descomenta las reglas con 'layout tiling' (una por cada app que sí quieras en mosaico)
+# y, al final de todo, el bloque sin 'if'. Debe quedar en último lugar, porque
+# captura cualquier app que no coincidió antes.
+# [[on-window-detected]]
+# if.app-id = 'com.apple.Terminal'
+# run = 'layout tiling'
+#
+# [[on-window-detected]]
+# run = 'layout floating'

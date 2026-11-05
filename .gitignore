@@ -1,0 +1,3 @@
+*.bak-*
+timer_log.csv
+.DS_Store

@@ -1,0 +1,64 @@
+#!/bin/bash
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+PLUGINS="$HOME/.config/sketchybar/plugins"
+
+# Colores (tema oscuro con acento cian)
+BAR=0xd91a1b26
+ACTIVE_BG=0xff3b4261
+ACCENT=0xff7dcfff
+TEXT=0xffc0caf5
+DIM=0xff7a84a8
+
+sketchybar --bar position=top height=32 color=$BAR blur_radius=30 \
+                 padding_left=10 padding_right=10 sticky=on
+
+sketchybar --default \
+  icon.drawing=off \
+  label.font="SF Pro:Semibold:13.0" \
+  label.color=$TEXT \
+  label.padding_left=10 label.padding_right=10 \
+  background.corner_radius=7 background.height=22 \
+  padding_left=3 padding_right=3
+
+# Eventos que manda AeroSpace
+sketchybar --add event aerospace_workspace_change
+sketchybar --add event aerospace_focus_change
+
+# --- Izquierda: escritorios 1 a 4 (clic para cambiar)
+for n in 1 2 3 4; do
+  sketchybar --add item ws.$n left \
+             --set ws.$n label="$n" \
+                   click_script="/opt/homebrew/bin/aerospace workspace $n" \
+                   script="$PLUGINS/workspaces.sh" \
+             --subscribe ws.$n aerospace_workspace_change
+done
+
+# --- Centro: pestañas (hasta 8 ventanas del escritorio actual)
+for n in 1 2 3 4 5 6 7 8 9 10; do
+  sketchybar --add item tab.$n center \
+             --set tab.$n drawing=off \
+                   click_script="/opt/homebrew/bin/aerospace focus --window-id \$(cat /tmp/sbtab.$n 2>/dev/null)"
+done
+
+# Item invisible que refresca las pestañas
+sketchybar --add item tabs.driver center \
+           --set tabs.driver drawing=off updates=on update_freq=2 \
+                 script="$PLUGINS/tabs.sh" \
+           --subscribe tabs.driver aerospace_workspace_change aerospace_focus_change front_app_switched system_woke
+
+# --- Derecha: hora y batería
+sketchybar --add item clock right \
+           --set clock update_freq=20 script="$PLUGINS/clock.sh" \
+           --add item battery right \
+           --set battery update_freq=120 script="$PLUGINS/battery.sh" \
+           --subscribe battery system_woke power_source_change
+
+# --- timer ---
+sketchybar --add item pomo right \
+           --set pomo label="🍅 50:00" click_script="$PLUGINS/timer.sh pomo click" \
+           --add item sw right \
+           --set sw label="⏱ 00:00" click_script="$PLUGINS/timer.sh sw click" \
+           --add item timer.driver right \
+           --set timer.driver drawing=off updates=on update_freq=1 script="$PLUGINS/timer.sh tick"
+
+sketchybar --update
